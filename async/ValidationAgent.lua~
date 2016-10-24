@@ -305,9 +305,6 @@ function ValidationAgent:plotValidation()
     gnuplot.plotflush()
     torch.save(paths.concat('experiments', self._id, 'normScores.t7'), normScores)
   end
-
-gnuplot.close()
-
 end
 
 
