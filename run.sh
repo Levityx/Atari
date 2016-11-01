@@ -75,6 +75,7 @@ elif [ "$PAPER" == "async-a3c" ]; then
 
 #Swarm
 elif [ "$PAPER" == "demo-async-swarm" ]; then
+  pathToSwarmDqn="/home/kai/SwarmbotGazebo-DQN"
 	#Parameters
 	BUFFER="1"
 	MODE=1
@@ -82,18 +83,17 @@ elif [ "$PAPER" == "demo-async-swarm" ]; then
 	REWARD_TIME=0.3
 	NUM_BOTS=$((2 - 1)) #[Number of bots including number of validation agents] - [Number of validation agents]
 	#STAT_UPDATE_TIME=320
-	args=$NUM_FOOD
-	args="$args $NUM_BOTS"
+	args="$NUM_FOOD $NUM_BOTS"
 	#Load gazebo with arena world
 		#gnome-terminal -e "bash -c \"roslaunch swarm_simulator soup_plus.launch gui:=false ; exec bash\""
 		gnome-terminal -e "bash -c \"roslaunch swarm_simulator soup_black.launch gui:=false ; exec bash\""
 		#gnome-terminal -e "bash -c \"roslaunch swarm_simulator soup_plus_single.launch gui:=false ; exec bash\""
 	#Load models into the world
-		th async/SwarmbotGazebo-DQN/setup.lua $args
+		th $pathToSwarmDqn/setup.lua $args
 	#Throttle position updates
-		gnome-terminal -e "bash -c \"th async/SwarmbotGazebo-DQN/positions.lua ; exec bash\""
+		gnome-terminal -e "bash -c \"th $pathToSwarmDqn/positions.lua ; exec bash\"" #async/SwarmbotGazebo-DQN/
 	#Load program to allocate rewards
-		setup_command="th async/SwarmbotGazebo-DQN/rewards.lua "
+		setup_command="th $pathToSwarmDqn/rewards.lua " #async/SwarmbotGazebo-DQN/
 		setup_command="$setup_command $args $MODE"
 		gnome-terminal -e "bash -c \"$setup_command ; exec bash\""
 		#Load the statistics program
@@ -106,12 +106,11 @@ elif [ "$PAPER" == "demo-async-swarm" ]; then
 		#	gnome-terminal -e "bash -c \"$stats_command ; exec bash\""
 	if [ "$BUFFER" == "1" ]
 	then #Load the command buffer
-		buffer_command="th async/SwarmbotGazebo-DQN/command_buffer.lua "
-		buffer_command="$buffer_command $NUM_BOTS $REWARD_TIME"
+		buffer_command="th $pathToSwarmDqn/command_buffer.lua $NUM_BOTS $REWARD_TIME"  #async/SwarmbotGazebo-DQN/
 		gnome-terminal -e "bash -c \"$buffer_command ; exec bash\""
 	fi
-	#Run the Atari code
-  	th main.lua -threads $NUM_BOTS -zoom 4 -env async/SwarmbotGazebo-DQN/GazeboEnv -modelBody async/SwarmbotGazebo-DQN/SwarmbotModel -histLen 4 -async A3C -entropyBeta 0 -eta 0.0001 -bootstraps 0 -rewardClip 0 -hiddenSize 512 -doubleQ false -duel false -optimiser sharedRmsProp -steps 6750000 -valFreq 501 -valSteps 6000 -PALpha 0 "$@"
+	#Run the Atari code (async/SwarmbotGazebo-DQN/ removed for GazeboEnv and SwarmbotModel)
+  	th main.lua -threads $NUM_BOTS -zoom 4 -env GazeboEnv -modelBody SwarmbotModel -histLen 4 -async A3C -entropyBeta 0 -eta 0.0001 -bootstraps 0 -rewardClip 0 -hiddenSize 512 -doubleQ false -duel false -optimiser sharedRmsProp -steps 6750000 -valFreq 501 -valSteps 12000 -PALpha 0 "$@"
 	#To load previous weights: -network async/SwarmbotGazebo-DQN/Experiments/GazeboEnv_10-Worked/Weights/last.weights.t7
 	# -network GazeboEnv/last.weights.t7 -mode eval -_id GazeboEnv
 
