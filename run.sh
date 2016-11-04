@@ -79,11 +79,12 @@ elif [ "$PAPER" == "demo-async-swarm" ]; then
 	#Parameters
 	BUFFER="1"
 	MODE=1
-	NUM_FOOD=40
+	NUM_FOOD=8 #40
 	REWARD_TIME=0.3
-	NUM_BOTS=$((2 - 1)) #[Number of bots including number of validation agents] - [Number of validation agents]
+	NUM_BOTS=$((3 - 1)) #[Number of bots including number of validation agents] - [Number of validation agents]
+  NUM_PRED=$((2 - 1)) #[Number of predators including valitator] - [Number of validation agents]
 	#STAT_UPDATE_TIME=320
-	args="$NUM_FOOD $NUM_BOTS"
+	args="$NUM_FOOD $NUM_BOTS $NUM_PRED"
 	#Load gazebo with arena world
 		#gnome-terminal -e "bash -c \"roslaunch swarm_simulator soup_plus.launch gui:=false ; exec bash\""
 		gnome-terminal -e "bash -c \"roslaunch swarm_simulator soup_black.launch gui:=false ; exec bash\""
@@ -93,8 +94,7 @@ elif [ "$PAPER" == "demo-async-swarm" ]; then
 	#Throttle position updates
 		gnome-terminal -e "bash -c \"th $pathToSwarmDqn/positions.lua ; exec bash\"" #async/SwarmbotGazebo-DQN/
 	#Load program to allocate rewards
-		setup_command="th $pathToSwarmDqn/rewards.lua " #async/SwarmbotGazebo-DQN/
-		setup_command="$setup_command $args $MODE"
+		setup_command="th $pathToSwarmDqn/rewards.lua $MODE $args " #async/SwarmbotGazebo-DQN/
 		gnome-terminal -e "bash -c \"$setup_command ; exec bash\""
 		#Load the statistics program
 		#	base_command="th async/SwarmbotGazebo-DQN/statistics.lua "
